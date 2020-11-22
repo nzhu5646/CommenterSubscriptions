@@ -1,6 +1,7 @@
 from scrape_video import Scraper
 
 scraper = Scraper()
-# scraper.scrape_commenter_subs("./txt/commenters.txt", "./txt/commenter_subs.txt")
-
-scraper.scrape_commenters("./txt/videos.txt", "./txt/video_commenters.txt")
+#commenter_subs = scraper.scrape_commenter_subs("UC7ZUmtySp0bx2lw_1VGw3Yg")
+#print(commenter_subs)
+comments = scraper.scrape_commenters("-SaPhS9c5Fw")
+print(comments)
