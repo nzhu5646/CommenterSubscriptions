@@ -4,11 +4,11 @@ import time
 import os
 import random
 import datetime
+import utils
 
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 
-from utils import parse_comments, get_comment_count, parse_subs
 
 class Scraper():
     def __init__(self, driver=None):
@@ -58,7 +58,7 @@ class Scraper():
 
         # Output ALL subs data
         print(datetime.datetime.now())
-        sub_l = parse_subs(last_inc_html)
+        sub_l = utils.parse_subs(last_inc_html)
 
         driver.close()
         return sub_l
@@ -66,8 +66,7 @@ class Scraper():
     """
     Given a video URI, will attempt to scrape comments and metadata from comment section.
     Input: Video URI
-    Output: List of coment tuples each with the form (comment_author, comment, num_likes)
-    Note: Will not work if channel is identified by username
+    Output: List of comment tuples each with the form (comment_author, comment, num_likes)
     """
     def scrape_commenters(self, video_id):
         if self.driver_path:
@@ -87,7 +86,7 @@ class Scraper():
             driver.execute_script("window.scrollTo(0, %(scroll_amount)s);" % vars())
             time.sleep(2)
             html = driver.page_source.encode("ascii", "ignore").decode()
-            com_c = get_comment_count(html)
+            com_c = utils.get_comment_count(html)
             print(no_improvement, com_c)
             if com_c == last_com_c:
                 no_improvement += 1
@@ -98,10 +97,48 @@ class Scraper():
             last_com_c = com_c
 
         # Parse and output results
-        comments = []
-        for author_channel, comment, likes in parse_comments(html):
-            comments.append([author_channel, comment, likes])
+        comments = utils.parse_comments(html)
         print(datetime.datetime.now())
 
         driver.close()
         return comments
+
+    """
+    Given a video URI, will attempt to scrape recommended videos
+    Input: Video URI
+    Output: List of video tuples each with the form (video_title, video_uri, channel_name, num_views, publish_date)
+    """
+    def scrape_recommended(self, video_id):
+        if self.driver_path:
+            driver = webdriver.Chrome(executable_path=self.driver_path)
+        else:
+            driver = webdriver.Chrome()
+
+        url = "https://www.youtube.com/watch?v=" + video_id
+        print("Scraping:", url)
+        driver.get(url)
+        time.sleep(3)
+        rec_c = 0
+        last_rec_c = 0
+        no_improvement = 0
+        for i in range(10):
+            scroll_amount = str((i+1)*500)
+            driver.execute_script("window.scrollTo(0, %(scroll_amount)s);" % vars())
+            time.sleep(2)
+            html = driver.page_source.encode("ascii", "ignore").decode()
+            rec_c = utils.get_recommended_count(html)
+            print(no_improvement, rec_c)
+            if rec_c == last_rec_c:
+                no_improvement += 1
+            else:
+                no_improvement = 0
+            if no_improvement >= 2:
+                break
+            last_rec_c = rec_c
+
+        # Parse and output results
+        recommended = utils.parse_recommended(html)
+        print(datetime.datetime.now())
+
+        driver.close()
+        return recommended

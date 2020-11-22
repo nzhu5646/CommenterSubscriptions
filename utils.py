@@ -1,5 +1,5 @@
 import re
- 
+
 def parse_subs(html):
     sub_l = []
     for chan_seg in html.split('<div id="channel" class="style-scope ytd-grid-channel-renderer">')[1:]:
@@ -58,5 +58,46 @@ def get_comment_count(html):
         # Estimate number of comments
         num_coms = len(html.split("</yt-formatted-string><yt-formatted-string id")) - 1
         return num_coms
+    else:
+        return 0
+
+def parse_recommended(html):
+    rec_l = []
+    # Parsing recommended videos
+    for rec_section in html.split('<ytd-compact-video-renderer class="style-scope ytd-watch-next-secondary-results-renderer"')[1:]:
+        # Video title
+        m = re.search('title="(.*)"', rec_section)
+        if m is None: continue
+        video_title = m.group(1)
+
+        # Video Link
+        m = re.search('href="\/watch\?v=(.*)"', rec_section)
+        if m is None: continue
+        video_uri = m.group(1)
+
+        # Channel name
+        m = re.search('ytd-channel-name" ellipsis-truncate="">(.*)<\/yt-formatted-string>', rec_section)
+        if m is None: continue
+        channel_name = m.group(1)
+
+        # Views
+        m = re.search('<span class="style-scope ytd-video-meta-block">(.*) views', rec_section)
+        if m is None: continue
+        views = m.group(1)
+
+        # Time
+        m = re.search('<span class="style-scope ytd-video-meta-block">(.*) ago', rec_section)
+        if m is None: continue
+        time = m.group(1)
+
+        rec_l.append((video_title, video_uri, channel_name, views, time))
+    return rec_l
+
+def get_recommended_count(html):
+    if "style-scope ytd-compact-video-renderer" in html:
+        no_rec_c = 0
+        # Estimate number of recommended videos
+        num_rec = len(html.split("<ytd-compact-video-renderer")) - 1
+        return num_rec
     else:
         return 0
