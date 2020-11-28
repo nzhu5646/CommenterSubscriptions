@@ -8,7 +8,6 @@ import utils
 
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
-from pyvirtualdisplay import Display
 
 
 class Scraper():
@@ -25,14 +24,15 @@ class Scraper():
     instead of the channel's featured channels.
     """
     def scrape_commenter_featured(self, channel_id):
+        options = None
         if self.headless:
-            display = Display(visible=0, size=(1920, 1080))
-            display.start()
+            options = Options()
+            options.headless = True
 
         if self.driver_path:
-            driver = webdriver.Chrome(executable_path=self.driver_path)
+            driver = webdriver.Chrome(executable_path=self.driver_path, chrome_options=options)
         else:
-            driver = webdriver.Chrome()
+            driver = webdriver.Chrome(chrome_options=options)
 
 
         url = "https://www.youtube.com/channel/" + channel_id + "/channels"
@@ -48,7 +48,7 @@ class Scraper():
             scroll_amount = str((scroll_c+1)*20000)
             driver.execute_script("window.scrollTo(0, %(scroll_amount)s);" % vars())
             time.sleep(2)
-            html = driver.page_source.encode("ascii", "ignore").decode()
+            html = driver.page_source.encode("utf-8").decode()
             num_subs = len(html.split('<div id="channel" class="style-scope ytd-grid-channel-renderer">'))
             if num_subs < last_sub_c:
                 break
@@ -68,8 +68,6 @@ class Scraper():
         sub_l = utils.parse_subs(last_inc_html)
 
         driver.close()
-        if self.headless:
-            display.stop()
 
         return sub_l
 
@@ -79,14 +77,15 @@ class Scraper():
     Output: List of comment tuples each with the form (comment_author, comment, num_likes)
     """
     def scrape_commenters(self, video_id):
+        options = None
         if self.headless:
-            display = Display(visible=0, size=(1920, 1080))
-            display.start()
+            options = Options()
+            options.headless = True
 
         if self.driver_path:
-            driver = webdriver.Chrome(executable_path=self.driver_path)
+            driver = webdriver.Chrome(executable_path=self.driver_path, chrome_options=options)
         else:
-            driver = webdriver.Chrome()
+            driver = webdriver.Chrome(chrome_options=options)
 
         url = "https://www.youtube.com/watch?v=" + video_id
         print("Scraping:", url)
@@ -99,7 +98,7 @@ class Scraper():
             scroll_amount = str((i+1)*500)
             driver.execute_script("window.scrollTo(0, %(scroll_amount)s);" % vars())
             time.sleep(2)
-            html = driver.page_source.encode("ascii", "ignore").decode()
+            html = driver.page_source.encode("utf-8").decode()
             com_c = utils.get_comment_count(html)
             print(no_improvement, com_c)
             if com_c == last_com_c:
@@ -115,8 +114,6 @@ class Scraper():
         print(datetime.datetime.now())
 
         driver.close()
-        if self.headless:
-            display.stop()
 
         return comments
 
@@ -126,14 +123,15 @@ class Scraper():
     Output: List of video tuples each with the form (video_title, video_uri, channel_name, num_views, publish_date)
     """
     def scrape_recommended(self, video_id):
+        options = None
         if self.headless:
-            display = Display(visible=0, size=(1920, 1080))
-            display.start()
+            options = Options()
+            options.headless = True
 
         if self.driver_path:
-            driver = webdriver.Chrome(executable_path=self.driver_path)
+            driver = webdriver.Chrome(executable_path=self.driver_path, chrome_options=options)
         else:
-            driver = webdriver.Chrome()
+            driver = webdriver.Chrome(chrome_options=options)
 
         url = "https://www.youtube.com/watch?v=" + video_id
         print("Scraping:", url)
@@ -146,7 +144,7 @@ class Scraper():
             scroll_amount = str((i+1)*500)
             driver.execute_script("window.scrollTo(0, %(scroll_amount)s);" % vars())
             time.sleep(2)
-            html = driver.page_source.encode("ascii", "ignore").decode()
+            html = driver.page_source.encode("utf-8").decode()
             rec_c = utils.get_recommended_count(html)
             print(no_improvement, rec_c)
             if rec_c == last_rec_c:
@@ -162,7 +160,5 @@ class Scraper():
         print(datetime.datetime.now())
 
         driver.close()
-        if self.headless:
-            display.stop()
 
         return recommended

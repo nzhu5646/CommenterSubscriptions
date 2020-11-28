@@ -8,5 +8,5 @@ scraper = Scraper(headless=True)
 # comments = scraper.scrape_commenters("-SaPhS9c5Fw")
 # print(comments)
 
-recommended = scraper.scrape_recommended("-SaPhS9c5Fw")
+recommended = scraper.scrape_recommended("MClIOo_zS9Q")
 print(recommended)
