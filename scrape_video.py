@@ -8,20 +8,27 @@ import utils
 
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
+from pyvirtualdisplay import Display
 
 
 class Scraper():
-    def __init__(self, driver=None):
+    def __init__(self, headless=False, driver=None):
         self.driver_path = driver
+        self.headless = headless
 
     """
     Given a channel URI, will crawl through the list of featured/subscribed channels and
     compile into a list. Will attempt to get the first 1000 subscribers.
     Input: Channel URI
     Output: List of subscribed channel tuples each with the form (channel_URI, channel_name, num_subscribers)
-    Note: Will not work if channel is identified by username
+    Note: Will not work if channel is identified by username. Also used to list the channel's subscriptions
+    instead of the channel's featured channels.
     """
-    def scrape_commenter_subs(self, channel_id):
+    def scrape_commenter_featured(self, channel_id):
+        if self.headless:
+            display = Display(visible=0, size=(1920, 1080))
+            display.start()
+
         if self.driver_path:
             driver = webdriver.Chrome(executable_path=self.driver_path)
         else:
@@ -61,6 +68,9 @@ class Scraper():
         sub_l = utils.parse_subs(last_inc_html)
 
         driver.close()
+        if self.headless:
+            display.stop()
+
         return sub_l
 
     """
@@ -69,6 +79,10 @@ class Scraper():
     Output: List of comment tuples each with the form (comment_author, comment, num_likes)
     """
     def scrape_commenters(self, video_id):
+        if self.headless:
+            display = Display(visible=0, size=(1920, 1080))
+            display.start()
+
         if self.driver_path:
             driver = webdriver.Chrome(executable_path=self.driver_path)
         else:
@@ -101,6 +115,9 @@ class Scraper():
         print(datetime.datetime.now())
 
         driver.close()
+        if self.headless:
+            display.stop()
+
         return comments
 
     """
@@ -109,6 +126,10 @@ class Scraper():
     Output: List of video tuples each with the form (video_title, video_uri, channel_name, num_views, publish_date)
     """
     def scrape_recommended(self, video_id):
+        if self.headless:
+            display = Display(visible=0, size=(1920, 1080))
+            display.start()
+
         if self.driver_path:
             driver = webdriver.Chrome(executable_path=self.driver_path)
         else:
@@ -141,4 +162,7 @@ class Scraper():
         print(datetime.datetime.now())
 
         driver.close()
+        if self.headless:
+            display.stop()
+
         return recommended
