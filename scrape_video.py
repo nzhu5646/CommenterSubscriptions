@@ -16,11 +16,11 @@ class Scraper():
         self.headless = headless
 
     """
-    Given a channel URI, will crawl through the list of featured/subscribed channels and
+    Given a channel URI, will crawl through the list of featured channels and
     compile into a list. Will attempt to get the first 1000 subscribers.
     Input: Channel URI
-    Output: List of subscribed channel tuples each with the form (channel_URI, channel_name, num_subscribers)
-    Note: Will not work if channel is identified by username. Also used to list the channel's subscriptions
+    Output: List of featured channel dictionaries each with the fields (channel_uri, channel_name, num_subscribers)
+    Note: Used to list the channel's subscriptions
     instead of the channel's featured channels.
     """
     def scrape_commenter_featured(self, channel_id):
@@ -74,7 +74,7 @@ class Scraper():
     """
     Given a video URI, will attempt to scrape comments and metadata from comment section.
     Input: Video URI
-    Output: List of comment tuples each with the form (comment_author, comment, num_likes)
+    Output: List of dictionaries each with the following fields (author_channel, comment, num_likes)
     """
     def scrape_commenters(self, video_id):
         options = None
@@ -90,14 +90,14 @@ class Scraper():
         url = "https://www.youtube.com/watch?v=" + video_id
         print("Scraping:", url)
         driver.get(url)
-        time.sleep(3)
+        time.sleep(10)
         com_c = 0
         last_com_c = 0
         no_improvement = 0
         for i in range(10):
             scroll_amount = str((i+1)*500)
             driver.execute_script("window.scrollTo(0, %(scroll_amount)s);" % vars())
-            time.sleep(2)
+            time.sleep(10)
             html = driver.page_source.encode("utf-8").decode()
             com_c = utils.get_comment_count(html)
             print(no_improvement, com_c)
@@ -110,6 +110,8 @@ class Scraper():
             last_com_c = com_c
 
         # Parse and output results
+        test_file = open("test_good.txt", "w")
+        test_file.write(html)
         comments = utils.parse_comments(html)
         print(datetime.datetime.now())
 
@@ -120,7 +122,7 @@ class Scraper():
     """
     Given a video URI, will attempt to scrape recommended videos
     Input: Video URI
-    Output: List of video tuples each with the form (video_title, video_uri, channel_name, num_views, publish_date)
+    Output: List of dictionaries each with the following fields (title, video_uri, channel_name, num_views, publish_date, timestamp)
     """
     def scrape_recommended(self, video_id):
         options = None
