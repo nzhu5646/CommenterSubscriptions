@@ -1,6 +1,6 @@
 from scrape_video import Scraper
 
-scraper = Scraper(headless=False)
+scraper = Scraper(headless=True)
 
 # commenter_featured = scraper.scrape_commenter_featured("UC7ZUmtySp0bx2lw_1VGw3Yg")
 # print(commenter_featured)

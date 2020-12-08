@@ -81,6 +81,9 @@ class Scraper():
         if self.headless:
             options = Options()
             options.headless = True
+            options.add_experimental_option("excludeSwitches", ["enable-automation"])
+            options.add_experimental_option('useAutomationExtension', False)
+            options.add_argument('--window-size=1920,1080')
 
         if self.driver_path:
             driver = webdriver.Chrome(executable_path=self.driver_path, chrome_options=options)
@@ -90,14 +93,14 @@ class Scraper():
         url = "https://www.youtube.com/watch?v=" + video_id
         print("Scraping:", url)
         driver.get(url)
-        time.sleep(10)
+        time.sleep(5)
         com_c = 0
         last_com_c = 0
         no_improvement = 0
         for i in range(10):
             scroll_amount = str((i+1)*500)
             driver.execute_script("window.scrollTo(0, %(scroll_amount)s);" % vars())
-            time.sleep(10)
+            time.sleep(5)
             html = driver.page_source.encode("utf-8").decode()
             com_c = utils.get_comment_count(html)
             print(no_improvement, com_c)
@@ -110,8 +113,6 @@ class Scraper():
             last_com_c = com_c
 
         # Parse and output results
-        test_file = open("test_good.txt", "w")
-        test_file.write(html)
         comments = utils.parse_comments(html)
         print(datetime.datetime.now())
 
