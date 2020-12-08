@@ -123,8 +123,11 @@ class Scraper():
                 last_com_c = com_c
 
             # Parse and output results
-            comments = utils.parse_comments(html)[:num_comments]
-            output[video_id] = comments
+            comments = utils.parse_comments(html)
+            if len(comments) > num_comments:
+                output[video_id] = comments[:num_comments]
+            else:
+                output[video_id] = comments
 
         driver.close()
 
