@@ -133,7 +133,7 @@ class Scraper():
     """
     Given a video URI, will attempt to scrape recommended videos
     Input: list of Video URIs
-    Output: List of dictionaries each with the following fields (title, video_uri, channel_name, num_views, publish_date, timestamp)
+    Output: List of dictionaries each with the following fields (title, uri, channel_name, view_count, publish_date_string, collection_date)
     """
     def scrape_recommended(self, video_ids):
         options = None

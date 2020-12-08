@@ -77,7 +77,7 @@ def parse_recommended(html):
         m = re.search('href="\/watch\?v=(.*)"', rec_section)
         if m is None: continue
         video_uri = m.group(1)
-        rec["video_uri"] = video_uri
+        rec["uri"] = video_uri
 
         # Channel name
         m = re.search('ytd-channel-name" ellipsis-truncate="">(.*)<\/yt-formatted-string>', rec_section)
@@ -89,16 +89,16 @@ def parse_recommended(html):
         m = re.search('<span class="style-scope ytd-video-meta-block">(.*) views', rec_section)
         if m is None: continue
         views = m.group(1)
-        rec["num_views"] = text_to_num(views)
+        rec["view_count"] = text_to_num(views)
 
         # Time
         m = re.search('<span class="style-scope ytd-video-meta-block">(.*) ago', rec_section)
         if m is None: continue
         time = m.group(1)
-        rec["publish_date"] = time
+        rec["publish_date_string"] = time
 
         # Add timestamp
-        rec["timestamp"] = datetime.now()
+        rec["collection_date"] = datetime.now()
 
         rec_l.append(rec)
     return rec_l
